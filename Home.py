@@ -1,27 +1,24 @@
 import streamlit as st
-import os
 import pandas as pd
-import json
+import numpy as np
+import matplotlib.pyplot as plt
 
+from assets.data_staging import *
 
 if __name__ == '__main__':
+    # Stage data
+    staged_data, staged_data_name = stage_data()
+
     # Set streamlit title
     st.title('US-EIA Web App')
 
-    # Change file path to access bulk data
-    file_bulk_data = os.path.join(os.getcwd(), 'assets/STEO.txt')
-    # Quick test of file path
-    st.write(file_bulk_data)
+    option = st.selectbox(
+        'Which data series are you interested in?',
+        np.sort(staged_data_name)
+    )
 
-    # Allocate data (should write this to parquet file later
-    data = []
-    with open(file_bulk_data) as f:
-        for idx, line in enumerate(f):
-            data.append(json.loads(line))
+    fig = create_wti_monthly_chart(staged_data_name, staged_data)
 
-    # Export the first series of data to page
-    df = pd.DataFrame.from_dict(data[0])
-    st.dataframe(df)
+    st.pyplot(fig)
 
-    # Prove that we are still in the root path
-    st.write(os.getcwd())
+
